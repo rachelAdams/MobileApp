@@ -1,7 +1,13 @@
+// Rachel Adams & Grace Whitmore
+// 4/9/14
+// Mobile App: Assignment 1
+// A game where you make anagram substrings out of a given word.
+// Now with new and resume current game options!
+
+
 package com.adamsrwhitmorg.wordytime.app;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -21,6 +27,7 @@ public class wordyTimeMenu extends Activity implements View.OnClickListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Instantiate and listen for resume and new game buttons
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wordy_time_menu);
 
@@ -32,6 +39,8 @@ public class wordyTimeMenu extends Activity implements View.OnClickListener {
     }
 
     public void onClick(View view) {
+        // Reset score and word if new game button is clicked,
+        // load previous if resume game is clicked.
         if (view.getId() == R.id.newGameButton) {
             saveData = getSharedPreferences(MyPREFERENCES, 0);
             SharedPreferences.Editor editor = saveData.edit();

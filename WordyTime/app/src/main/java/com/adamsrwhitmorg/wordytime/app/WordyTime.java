@@ -1,62 +1,53 @@
+// Rachel Adams & Grace Whitmore
+// 4/9/14
+// Mobile App: Assignment 1
+// A game where you make anagram substrings out of a given word.
+// Now with new and resume current game options!
+
+
 package com.adamsrwhitmorg.wordytime.app;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.text.Editable;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.view.KeyEvent;
 import android.view.View.OnKeyListener;
 
 import java.io.BufferedReader;
-import java.io.Console;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import android.widget.Toast;
-import android.view.View;
 import android.widget.Button;
-
-import static android.view.View.OnClickListener;
 
 public class WordyTime extends Activity implements View.OnClickListener  {
 
     BufferedReader dictFile;
     File file = new File("sdcard/Download/words10thou.txt");
-
-    TextView currentWord;
-    TextView currentScore;
-
     public static final String MyPREFERENCES = "MyPrefs";
-    public static final String CurrentWord = "wordKey";
-    public static final String CurrentScore = "scoreKey";
-
     String word;
     String userWord;
-
     int score = 0;
-
     List<String> usedWords = new ArrayList<String>();
-
     private EditText edittext;
-
     SharedPreferences sharedpreferences;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        //OnCreate set button and keyboard input listeners, and loads a previous state if resume game is chosen.
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wordy_time);
 
@@ -67,10 +58,6 @@ public class WordyTime extends Activity implements View.OnClickListener  {
         Button menuButton = (Button)this.findViewById(R.id.menuButton);
         menuButton.setOnClickListener(this);
         sharedpreferences = getSharedPreferences(MyPREFERENCES, 0);
-        /*SharedPreferences.Editor editor = sharedpreferences.edit();
-        editor.putString("CurrentWord", "");
-        editor.putInt("CurrentScore", 0);
-        editor.commit();*/
         if (sharedpreferences.getString("CurrentWord", "") == ""){
             getNewWord();
             score = 0;
@@ -86,6 +73,8 @@ public class WordyTime extends Activity implements View.OnClickListener  {
     }
 
     public void onClick(View view) {
+        // Get a new word when New Word button is clicked,
+        // or load the menu activity is Menu button is clicked
         if (view.getId() == R.id.newWordButton) {
             getNewWord();
         }
@@ -94,7 +83,9 @@ public class WordyTime extends Activity implements View.OnClickListener  {
         }
     }
 
+
     public void getNewWord(){
+        // Calls pickRandomWord and puts that word on the screen
 
         try{
             TextView textToDisplay = (TextView)findViewById(R.id.displayWord);
@@ -106,7 +97,10 @@ public class WordyTime extends Activity implements View.OnClickListener  {
         catch(IOException e) {e.printStackTrace();}
     }
 
+
     public void addKeyListener(){
+        // Listen for that enter key then grab the user's input word
+
         edittext = (EditText) findViewById(R.id.editText);
         edittext.setOnKeyListener(new OnKeyListener(){
 
@@ -136,6 +130,8 @@ public class WordyTime extends Activity implements View.OnClickListener  {
 
 
     public void pickRandomWord() throws IOException{
+        // Grab a random word from the dictionary, bro!
+
         Random random = new Random();
         int randInt = random.nextInt(10000);
         int count = 0;
@@ -153,6 +149,10 @@ public class WordyTime extends Activity implements View.OnClickListener  {
     }
 
     public void isAWord(boolean newWord) throws IOException{
+        // Checks if the user's input contains only letters from the given word,
+        // and that it's a valid word in our less than amazing dictionary. Also
+        // adds the length of the valid user input word to the user's score.
+
         StringBuilder mutableWord = new StringBuilder(word);
         StringBuilder mutableWord2 = new StringBuilder(userWord);
         if (!(usedWords.contains(userWord) && newWord)){
