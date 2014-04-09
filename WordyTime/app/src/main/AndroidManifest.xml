@@ -7,14 +7,21 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
+
         <activity
             android:name="com.adamsrwhitmorg.wordytime.app.WordyTime"
             android:label="@string/app_name" >
+
+
+        </activity>
+        <activity
+            android:name="com.adamsrwhitmorg.wordytime.app.wordyTimeMenu"
+            android:label="@string/title_activity_wordy_time_menu">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
     </application>
 
