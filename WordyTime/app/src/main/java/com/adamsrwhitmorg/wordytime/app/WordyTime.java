@@ -7,6 +7,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.view.KeyEvent;
 import android.view.View.OnKeyListener;
@@ -17,34 +18,59 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 import android.widget.Toast;
+import android.view.View;
+import android.widget.Button;
 
-public class WordyTime extends Activity {
+import static android.view.View.OnClickListener;
+
+public class WordyTime extends Activity implements View.OnClickListener  {
 
     BufferedReader dictFile;
-    File file = new File("./words10thou.txt");
-    {
-        try {
-            dictFile = new BufferedReader(new FileReader(file));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
+    File file = new File("sdcard/Download/words10thou.txt");
 
     String word;
     String userWord;
-    //final EditText ET = (EditText) findViewById(R.id.editText);
+
+    int score = 0;
+
+    List<String> usedWords = new ArrayList<String>();
+
     private EditText edittext;
 
 
     @Override
-    protected void onCreate(Bundle savedInstanceState){
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wordy_time);
+
+
+        getNewWord();
         addKeyListener();
+        Button button = (Button)this.findViewById(R.id.newWordButton);
+        button.setOnClickListener(this);
+    }
 
+    public void onClick(View view) {
+        if (view.getId() == R.id.newWordButton) {
+            getNewWord();
+        }
+    }
 
+    public void getNewWord(){
+
+        try{
+            TextView textToDisplay = (TextView)findViewById(R.id.displayWord);
+            dictFile = new BufferedReader(new FileReader(file));
+            pickRandomWord();
+
+            textToDisplay.setText(word);
+        }
+        catch(IOException e) {e.printStackTrace();}
     }
 
     public void addKeyListener(){
@@ -53,10 +79,13 @@ public class WordyTime extends Activity {
 
         public boolean onKey(View v, int keyCode, KeyEvent event) {
             if (keyCode == KeyEvent.KEYCODE_ENTER){
-                //Toast.makeText(WordyTime.this, edittext.getText(), Toast.LENGTH_LONG).show();
+
                 userWord = edittext.getText().toString().trim();
+
                 try {
-                    isAWord();
+
+                    isAWord(true);
+
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -72,38 +101,66 @@ public class WordyTime extends Activity {
         Random random = new Random();
         int randInt = random.nextInt(10000);
         int count = 0;
-        String startWord = "";
 
         String line;
+
         line = dictFile.readLine();
         while (line != null && count != randInt){
-            startWord = line;
+            line = dictFile.readLine();
+            word = line;
             count++;
         }
-        startWord.trim();
+        word = word.trim();
 
     }
 
-    public void isAWord() throws IOException{
-        String line = null;
-        String s;
-        if ((s = dictFile.readLine()) != null){
-            line = s;
+    public void isAWord(boolean newWord) throws IOException{
+        StringBuilder mutableWord = new StringBuilder(word);
+        StringBuilder mutableWord2 = new StringBuilder(userWord);
+        if (usedWords.contains(userWord) && newWord){
+            Toast.makeText(WordyTime.this, "You already tried that word, dummy!", Toast.LENGTH_LONG).show();
+
         }
-        else{
-            Toast.makeText(WordyTime.this, userWord, Toast.LENGTH_LONG).show();}
+        else
+        {
+        for (int x=0; x<userWord.length(); x++)
+        {
+            int letterIndex = mutableWord.indexOf(Character.toString(mutableWord2.charAt(x)));
+            if (letterIndex != -1) {
+                mutableWord.deleteCharAt(letterIndex);
+            }
+            else{
+                newWord = false;
+                Toast.makeText(WordyTime.this, "One of those letters isn't in the word!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }
 
-        //line = dictFile.readLine().toString();
+        dictFile = new BufferedReader(new FileReader(file));
+        String line =  dictFile.readLine();
+        while ((line != null) ){
 
+            if (line.equals(userWord)){
+                newWord = false;
+                score += userWord.length();
+                TextView scoreToDisplay = (TextView)findViewById(R.id.scoreNumber);
+                scoreToDisplay.setText(Integer.toString(score));
 
-//        while (line != null && line != userWord)
-//        {
-//
-//           line = dictFile.readLine().trim();
+                Toast.makeText(WordyTime.this, "Nice!", Toast.LENGTH_SHORT).show();
+                usedWords.add(userWord);
+                return;
 
-
-//        }
+            }
+            line = dictFile.readLine();
+        }
+        newWord = false;
+        Toast.makeText(WordyTime.this, "Oof. Not in our (shabby) dictionary.", Toast.LENGTH_SHORT).show();
+        usedWords.add(userWord);
+        }
     }
+
+
+
 
 
     @Override
